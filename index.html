@@ -173,9 +173,13 @@
     /* ─── METHOD ─────────────────────────────────────────────── */
     .method-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
       margin-top: 28px;
+    }
+
+    .method-card {
+      min-width: 0;
     }
 
     .method-card {
@@ -267,6 +271,107 @@
     .comp-block .label.good { color: #16a34a; }
 
     .comp-block img { width: 100%; display: block; }
+
+    /* ─── 3-WAY IMAGE COMPARE ──────────────────────────────── */
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .triple-compare,
+    .dual-compare {
+      position: relative;
+      width: 100%;
+      user-select: none;
+      overflow: hidden;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: #000;
+      touch-action: none;
+    }
+
+    /* sizer image keeps natural aspect ratio; remaining images overlay it */
+    .triple-compare .sizer,
+    .dual-compare .sizer {
+      width: 100%;
+      display: block;
+      visibility: hidden;
+    }
+
+    .triple-compare .layer,
+    .dual-compare .layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .triple-compare .handle,
+    .dual-compare .handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: rgba(255,255,255,0.95);
+      transform: translateX(-50%);
+      cursor: ew-resize;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+      z-index: 5;
+    }
+
+    .triple-compare .handle::after,
+    .dual-compare .handle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 36px;
+      height: 36px;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+
+    .triple-compare .handle::before,
+    .dual-compare .handle::before {
+      content: '\2194';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      z-index: 6;
+    }
+
+    .triple-compare .label-tag,
+    .dual-compare .label-tag {
+      position: absolute;
+      top: 12px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(0,0,0,0.55);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 4;
+      letter-spacing: 0.04em;
+    }
+
+    .compare-caption {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 10px;
+    }
 
     /* ─── MESH GRID ──────────────────────────────────────────── */
     .mesh-grid {
@@ -384,6 +489,8 @@
       .gif-grid.two-col { grid-template-columns: 1fr; }
       .comparison-row { grid-template-columns: 1fr; }
       .mesh-grid { grid-template-columns: repeat(2, 1fr); }
+      .compare-row { grid-template-columns: 1fr; }
+      .method-cards { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -391,7 +498,7 @@
 
 <!-- ═══════════════════════════════════════════════ HERO -->
 <header class="hero">
-  <div class="venue-badge">Eurographics 2026 &mdash; Short Papers</div>
+  <div class="venue-badge">Eurographics 2026 Short Papers</div>
 
   <h1>
     <span>2D-SuGaR</span>: Surface-Aware Gaussian Splatting<br />
@@ -456,6 +563,150 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ QUANT RESULTS -->
+  <section>
+    <p class="section-label">Quantitative Results</p>
+    <h2>DTU Benchmark: Chamfer Distance</h2>
+    <p style="color:var(--text-muted); margin-bottom: 4px; font-size:14.5px;">
+      Chamfer distance (lower is better) across 15 DTU scenes. <strong>Bold</strong> = best per column.
+    </p>
+    <div class="results-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>24</th><th>37</th><th>40</th><th>55</th><th>63</th>
+            <th>65</th><th>69</th><th>83</th><th>97</th><th>105</th>
+            <th>106</th><th>110</th><th>114</th><th>118</th><th>122</th>
+            <th>Mean ↓</th><th>Time ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2DGS</td>
+            <td>0.48</td><td>0.91</td><td>0.39</td><td>0.39</td><td>1.01</td>
+            <td>0.83</td><td>0.81</td><td>1.36</td><td>1.27</td><td>0.76</td>
+            <td>0.70</td><td>1.40</td><td>0.40</td><td>0.76</td><td>0.52</td>
+            <td>0.80</td><td>10.9m</td>
+          </tr>
+          <tr>
+            <td>MILo</td>
+            <td class="best">0.43</td><td>0.74</td><td>0.34</td><td class="best">0.37</td><td class="best">0.80</td>
+            <td>0.74</td><td>0.70</td><td>1.21</td><td>1.22</td><td>0.66</td>
+            <td>0.62</td><td class="best">0.80</td><td class="best">0.37</td><td>0.76</td><td>0.48</td>
+            <td>0.68</td><td>35m</td>
+          </tr>
+          <tr>
+            <td>Ours w/o Refinement</td>
+            <td>0.50</td><td>0.67</td><td>0.33</td><td>0.44</td><td>1.24</td>
+            <td>0.70</td><td>0.63</td><td>1.24</td><td>1.13</td><td>0.63</td>
+            <td>0.49</td><td>1.29</td><td>0.43</td><td>0.56</td><td>0.44</td>
+            <td>0.72</td><td class="best">10.5m</td>
+          </tr>
+          <tr class="highlight">
+            <td>Ours (2D-SuGaR)</td>
+            <td>0.48</td><td class="best">0.65</td><td class="best">0.29</td><td>0.39</td><td>1.24</td>
+            <td class="best">0.69</td><td class="best">0.61</td><td class="best">1.17</td><td class="best">1.10</td><td class="best">0.56</td>
+            <td class="best">0.45</td><td>1.19</td><td class="best">0.37</td><td class="best">0.50</td><td class="best">0.40</td>
+            <td class="best">0.67</td><td>18.5m</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ IMAGE COMPARE -->
+  <section>
+    <p class="section-label">Visual Comparison</p>
+    <h2>Ours vs. 2DGS vs. MILo</h2>
+
+    <h3 style="font-size:18px; font-weight:600; margin-top: 32px; margin-bottom: 12px;">DTU Scan 37</h3>
+    <div class="compare-row">
+      <div>
+        <div class="triple-compare"
+             data-img1="./assets/comparison/our_color.png"
+             data-img2="./assets/comparison/2dgs_color.png"
+             data-img3="./assets/comparison/milo_color.png"></div>
+        <div class="compare-caption">Mesh</div>
+      </div>
+      <div>
+        <div class="triple-compare"
+             data-img1="./assets/comparison/our.png"
+             data-img2="./assets/comparison/2dgs.png"
+             data-img3="./assets/comparison/milo.png"></div>
+        <div class="compare-caption">Geometry</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px; font-weight:600; margin-top: 40px; margin-bottom: 12px;">DTU Scan 69</h3>
+    <div class="compare-row">
+      <div>
+        <div class="triple-compare"
+             data-img1="./assets/comparison/69/Our_color.png"
+             data-img2="./assets/comparison/69/2DGS.png"
+             data-img3="./assets/comparison/69/Milo.png"></div>
+        <div class="compare-caption">Mesh</div>
+      </div>
+      <div>
+        <div class="triple-compare"
+             data-img1="./assets/comparison/69/Our.png"
+             data-img2="./assets/comparison/69/2dgs_color.png"
+             data-img3="./assets/comparison/69/milo_color.png"></div>
+        <div class="compare-caption">Geometry</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:20px; font-weight:700; margin-top: 48px; margin-bottom: 12px;">Ours vs. 2DGS</h3>
+
+    <h3 style="font-size:18px; font-weight:600; margin-top: 24px; margin-bottom: 12px;">DTU Scan 24</h3>
+    <div class="compare-row">
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/24/our_color.png"
+             data-img2="./assets/comparison/2gds_only/24/2dgs_color.png"></div>
+        <div class="compare-caption">Mesh</div>
+      </div>
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/24/our.png"
+             data-img2="./assets/comparison/2gds_only/24/2dgs.png"></div>
+        <div class="compare-caption">Geometry</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px; font-weight:600; margin-top: 32px; margin-bottom: 12px;">DTU Scan 106</h3>
+    <div class="compare-row">
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/106/our_color.png"
+             data-img2="./assets/comparison/2gds_only/106/2dgs_color.png"></div>
+        <div class="compare-caption">Mesh</div>
+      </div>
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/106/our.png"
+             data-img2="./assets/comparison/2gds_only/106/2dgs.png"></div>
+        <div class="compare-caption">Geometry</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px; font-weight:600; margin-top: 32px; margin-bottom: 12px;">DTU Scan 122</h3>
+    <div class="compare-row">
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/122/our_color.png"
+             data-img2="./assets/comparison/2gds_only/122/2dgs_color.png"></div>
+        <div class="compare-caption">Mesh</div>
+      </div>
+      <div>
+        <div class="dual-compare"
+             data-img1="./assets/comparison/2gds_only/122/our.png"
+             data-img2="./assets/comparison/2gds_only/122/2dgs.png"></div>
+        <div class="compare-caption">Geometry</div>
+      </div>
+    </div>
+  </section>
+
   <!-- ═══════════════════════════════════════════ METHOD -->
   <section>
     <p class="section-label">Method</p>
@@ -506,7 +757,7 @@
   <!-- ═══════════════════════════════════════════ NVS RESULTS -->
   <section class="gif-section">
     <p class="section-label">Results</p>
-    <h2>Novel View Synthesis — DTU Benchmark</h2>
+    <h2>Novel View Synthesis</h2>
     <p style="color:var(--text-muted); margin-bottom: 24px;">
       Our method simultaneously renders high-quality color, depth, and surface normal maps.
     </p>
@@ -549,21 +800,9 @@
     <p class="section-label">Custom Datasets</p>
     <h2>Generalization to In-the-Wild Scenes</h2>
 
-    <h3 style="margin-bottom:16px;">Room Scene</h3>
-    <div class="gif-grid two-col" style="max-width:720px;">
-      <div class="gif-card">
-        <img src="./assets/room_scene_color.gif" alt="Room scene color" />
-        <div class="caption">Color</div>
-      </div>
-      <div class="gif-card">
-        <img src="./assets/room_scene_depth.gif" alt="Room scene depth" />
-        <div class="caption">Depth</div>
-      </div>
-    </div>
-
-    <h3 style="margin: 32px 0 8px;">Frankfurt Fridge Magnet</h3>
+    <h3 style="margin-bottom: 8px;">Frankfurt Fridge Magnet</h3>
     <p style="color:var(--text-muted); margin-bottom: 20px; font-size:15px;">
-      A challenging small object on a plain surface — poor SfM initialization leads
+      A challenging small object on a plain surface, where poor SfM initialization leads
       to failure in 2DGS. Our depth-prior initialization recovers geometry cleanly.
     </p>
     <div class="comparison-row" style="max-width: 720px;">
@@ -578,109 +817,16 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════ MESH RECONS -->
-  <section>
-    <p class="section-label">Mesh Reconstruction</p>
-    <h2>DTU Mesh Quality</h2>
-    <p style="color:var(--text-muted); margin-bottom: 4px;">
-      Extracted meshes from 6 representative DTU scenes.
-    </p>
-    <div class="mesh-grid">
-      <div class="mesh-card">
-        <img src="./assets/scan_24_mesh.png" alt="Scan 24 mesh" />
-        <div class="caption">Scan 24</div>
-      </div>
-      <div class="mesh-card">
-        <img src="./assets/scan_37_mesh.png" alt="Scan 37 mesh" />
-        <div class="caption">Scan 37</div>
-      </div>
-      <div class="mesh-card">
-        <img src="./assets/scan_55_mesh.png" alt="Scan 55 mesh" />
-        <div class="caption">Scan 55</div>
-      </div>
-      <div class="mesh-card">
-        <img src="./assets/scan_69_mesh.png" alt="Scan 69 mesh" />
-        <div class="caption">Scan 69</div>
-      </div>
-      <div class="mesh-card">
-        <img src="./assets/scan_114_mesh.png" alt="Scan 114 mesh" />
-        <div class="caption">Scan 114</div>
-      </div>
-      <div class="mesh-card">
-        <img src="./assets/scan_122_mesh.png" alt="Scan 122 mesh" />
-        <div class="caption">Scan 122</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════ QUANT RESULTS -->
-  <section>
-    <p class="section-label">Quantitative Results</p>
-    <h2>DTU Benchmark — Chamfer Distance</h2>
-    <p style="color:var(--text-muted); margin-bottom: 4px; font-size:14.5px;">
-      Chamfer distance (lower is better) across 15 DTU scenes. <strong>Bold</strong> = best per column.
-    </p>
-    <div class="results-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Method</th>
-            <th>24</th><th>37</th><th>40</th><th>55</th><th>63</th>
-            <th>65</th><th>69</th><th>83</th><th>97</th><th>105</th>
-            <th>106</th><th>110</th><th>114</th><th>118</th><th>122</th>
-            <th>Mean ↓</th><th>Time ↓</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>2DGS</td>
-            <td>0.48</td><td>0.91</td><td>0.39</td><td>0.39</td><td>1.01</td>
-            <td>0.83</td><td>0.81</td><td>1.36</td><td>1.27</td><td>0.76</td>
-            <td>0.70</td><td>1.40</td><td>0.40</td><td>0.76</td><td>0.52</td>
-            <td>0.80</td><td>10.9m</td>
-          </tr>
-          <tr>
-            <td>MILo</td>
-            <td class="best">0.43</td><td>0.74</td><td>0.34</td><td class="best">0.37</td><td class="best">0.80</td>
-            <td>0.74</td><td>0.70</td><td>1.21</td><td>1.22</td><td>0.66</td>
-            <td>0.62</td><td class="best">0.80</td><td class="best">0.37</td><td>0.76</td><td>0.48</td>
-            <td>0.68</td><td>35m</td>
-          </tr>
-          <tr>
-            <td>Ours w/o Refinement</td>
-            <td>0.50</td><td>0.67</td><td>0.33</td><td>0.44</td><td>1.24</td>
-            <td>0.70</td><td>0.63</td><td>1.24</td><td>1.13</td><td>0.63</td>
-            <td>0.49</td><td>1.29</td><td>0.43</td><td>0.56</td><td>0.44</td>
-            <td>0.72</td><td class="best">10.5m</td>
-          </tr>
-          <tr class="highlight">
-            <td>Ours (2D-SuGaR)</td>
-            <td>0.48</td><td class="best">0.65</td><td class="best">0.29</td><td>0.39</td><td>1.24</td>
-            <td class="best">0.69</td><td class="best">0.61</td><td class="best">1.17</td><td class="best">1.10</td><td class="best">0.56</td>
-            <td class="best">0.45</td><td>1.19</td><td class="best">0.37</td><td class="best">0.50</td><td class="best">0.40</td>
-            <td class="best">0.67</td><td>18.5m</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
   <!-- ═══════════════════════════════════════════ CITATION -->
   <section>
     <p class="section-label">Citation</p>
-    <h2>BibTeX</h2>
-    <p style="color:var(--text-muted); margin-bottom: 4px; font-size:14.5px;">
-      If you find our work useful, please cite:
+    <h2>Coming Soon</h2>
+    <p style="color:var(--text-muted); font-size:15px;">
+      A preprint will be released on
+      <a href="https://arxiv.org" target="_blank">arXiv</a> shortly. The official BibTeX
+      entry will be added here once the paper is online and the Eurographics 2026
+      proceedings are published.
     </p>
-    <div class="bibtex-block">
-      <button class="copy-btn" onclick="copyBibtex(this)"><i class="fas fa-copy"></i> Copy</button>
-      <pre id="bibtex-text"><span class="kw">@inproceedings</span>{gupta2026sugar,
-  <span class="str">title</span>     = {<span class="val">2D-SuGaR: Surface-Aware Gaussian Splatting for Geometrically Accurate Mesh Reconstruction</span>},
-  <span class="str">author</span>    = {<span class="val">Gupta C.R., Prajwal and Sheth, Divyam and Ha, Jinjoo and Ostrek, Mirela and Thies, Justus</span>},
-  <span class="str">booktitle</span> = {<span class="val">Eurographics 2026 (Short Papers)</span>},
-  <span class="str">year</span>      = {<span class="val">2026</span>},
-}</pre>
-    </div>
   </section>
 
   <!-- ═══════════════════════════════════════════ ACKNOWLEDGEMENTS -->
@@ -707,7 +853,7 @@
 <!-- ═══════════════════════════════════════════════ FOOTER -->
 <footer>
   <p>
-    2D-SuGaR &mdash; Eurographics 2026 &nbsp;|&nbsp;
+    2D-SuGaR &nbsp;|&nbsp; Eurographics 2026 &nbsp;|&nbsp;
     <a href="https://github.com/Divyam10/2D-SuGaR" target="_blank">
       <i class="fab fa-github"></i> GitHub
     </a>
@@ -719,6 +865,181 @@
 </footer>
 
 <script>
+  function initTripleCompare(root) {
+    const img1Src = root.dataset.img1;
+    const img2Src = root.dataset.img2;
+    const img3Src = root.dataset.img3;
+
+    const labels = ['Ours', '2DGS', 'MILo'];
+
+    const sizer = document.createElement('img');
+    sizer.src = img1Src;
+    sizer.className = 'sizer';
+    sizer.alt = '';
+    root.appendChild(sizer);
+
+    const layers = [img3Src, img2Src, img1Src].map((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'layer';
+      img.alt = labels[2 - i];
+      img.draggable = false;
+      root.appendChild(img);
+      return img;
+    });
+    // layers[0] = MILo (full bg), layers[1] = 2DGS, layers[2] = Ours
+
+    const tagOurs = document.createElement('div');
+    tagOurs.className = 'label-tag';
+    tagOurs.style.left = '12px';
+    tagOurs.textContent = 'Ours';
+    root.appendChild(tagOurs);
+
+    const tagMid = document.createElement('div');
+    tagMid.className = 'label-tag';
+    tagMid.textContent = '2DGS';
+    root.appendChild(tagMid);
+
+    const tagMilo = document.createElement('div');
+    tagMilo.className = 'label-tag';
+    tagMilo.style.right = '12px';
+    tagMilo.textContent = 'MILo';
+    root.appendChild(tagMilo);
+
+    const handle1 = document.createElement('div');
+    handle1.className = 'handle';
+    root.appendChild(handle1);
+
+    const handle2 = document.createElement('div');
+    handle2.className = 'handle';
+    root.appendChild(handle2);
+
+    let p1 = 33.33;
+    let p2 = 66.66;
+
+    function apply() {
+      // Ours visible from 0 → p1
+      layers[2].style.clipPath = `inset(0 ${100 - p1}% 0 0)`;
+      // 2DGS visible from p1 → p2
+      layers[1].style.clipPath = `inset(0 ${100 - p2}% 0 ${p1}%)`;
+      // MILo visible from p2 → 100 (always full layer; clip left)
+      layers[0].style.clipPath = `inset(0 0 0 ${p2}%)`;
+
+      handle1.style.left = p1 + '%';
+      handle2.style.left = p2 + '%';
+
+      // center the middle label between handles
+      tagMid.style.left = ((p1 + p2) / 2) + '%';
+      tagMid.style.transform = 'translateX(-50%)';
+    }
+
+    apply();
+
+    let dragging = null; // 1 or 2
+    function onPointerDown(which, e) {
+      dragging = which;
+      e.preventDefault();
+    }
+    function onPointerMove(e) {
+      if (!dragging) return;
+      const rect = root.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let pct = ((clientX - rect.left) / rect.width) * 100;
+      pct = Math.max(0, Math.min(100, pct));
+      const margin = 1;
+      if (dragging === 1) {
+        p1 = Math.min(pct, p2 - margin);
+      } else {
+        p2 = Math.max(pct, p1 + margin);
+      }
+      apply();
+    }
+    function onPointerUp() { dragging = null; }
+
+    handle1.addEventListener('mousedown', (e) => onPointerDown(1, e));
+    handle2.addEventListener('mousedown', (e) => onPointerDown(2, e));
+    handle1.addEventListener('touchstart', (e) => onPointerDown(1, e), { passive: false });
+    handle2.addEventListener('touchstart', (e) => onPointerDown(2, e), { passive: false });
+
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
+    window.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('touchend', onPointerUp);
+    window.addEventListener('touchcancel', onPointerUp);
+  }
+
+  document.querySelectorAll('.triple-compare').forEach(initTripleCompare);
+
+  function initDualCompare(root) {
+    const img1Src = root.dataset.img1;
+    const img2Src = root.dataset.img2;
+
+    const sizer = document.createElement('img');
+    sizer.src = img1Src;
+    sizer.className = 'sizer';
+    sizer.alt = '';
+    root.appendChild(sizer);
+
+    // Background = img2 (2DGS), foreground (clipped) = img1 (Ours)
+    const bgLayer = document.createElement('img');
+    bgLayer.src = img2Src;
+    bgLayer.className = 'layer';
+    bgLayer.alt = '2DGS';
+    bgLayer.draggable = false;
+    root.appendChild(bgLayer);
+
+    const fgLayer = document.createElement('img');
+    fgLayer.src = img1Src;
+    fgLayer.className = 'layer';
+    fgLayer.alt = 'Ours';
+    fgLayer.draggable = false;
+    root.appendChild(fgLayer);
+
+    const tagOurs = document.createElement('div');
+    tagOurs.className = 'label-tag';
+    tagOurs.style.left = '12px';
+    tagOurs.textContent = 'Ours';
+    root.appendChild(tagOurs);
+
+    const tag2dgs = document.createElement('div');
+    tag2dgs.className = 'label-tag';
+    tag2dgs.style.right = '12px';
+    tag2dgs.textContent = '2DGS';
+    root.appendChild(tag2dgs);
+
+    const handle = document.createElement('div');
+    handle.className = 'handle';
+    root.appendChild(handle);
+
+    let p = 50;
+    function apply() {
+      fgLayer.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+      handle.style.left = p + '%';
+    }
+    apply();
+
+    let dragging = false;
+    handle.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
+    handle.addEventListener('touchstart', (e) => { dragging = true; e.preventDefault(); }, { passive: false });
+
+    function onMove(e) {
+      if (!dragging) return;
+      const rect = root.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      p = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      apply();
+    }
+    function onUp() { dragging = false; }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+    window.addEventListener('touchcancel', onUp);
+  }
+
+  document.querySelectorAll('.dual-compare').forEach(initDualCompare);
+
   function copyBibtex(btn) {
     const text = document.getElementById('bibtex-text').innerText;
     navigator.clipboard.writeText(text).then(() => {
